@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>CSV Uploader</title>
+        <link rel="stylesheet" href="../src/css/styles.css">
+        <script src="https://cdn.jsdelivr.net/npm/chart.js@4.3.0/dist/chart.umd.min.js"></script>
+    </head>
+    <body>
+        <div id="drop-area">
+            <h2>Drag & Drop your CSV file here</h2>
+            <input type="file" id="filename" accept=".csv" style="display:none">
+            <label class="button" for="filename" id="click-area">Or Click to select file</label>
+            <label class="button" for="filename" id="reset-area">Reset</label>
+            
+            <canvas id="myChart" width="400" height="200"></canvas>
+        </div>
+        <script src="../src/js/script.js"></script>
+    </body>
+</html>
