@@ -4,8 +4,9 @@ const clickArea = document.getElementById('click-area');
 const resetArea = document.getElementById('reset-area');
 const canvas = document.getElementById('myChart');
 const toggleButton = document.getElementById('toggleOrientation');
-let isOrientation = true;
+let isOriginalOrientation = true;
 
+let headers = [];
 let allData = [];
 
 dropArea.addEventListener('dragover', (e)=>{
@@ -63,15 +64,16 @@ fileInput.addEventListener('change', (e)=>{
     
 })
 
-toggleButton.addEventListener('click', ()=>{
-    isOrientation = !isOrientation;
+toggleButton.addEventListener('click', (e)=>{
+    isOriginalOrientation = !isOriginalOrientation;
     generateChartData(headers, allData);
+    e.preventDefault();
 });
 
 function parseCSV(csvText){
     const rows = csvText.trim().split("\n").map(row => row.split(","));
-    const headers = rows[0].map(header => header.trim());
-    console.log(headers, rows);
+    headers = rows[0].map(header => header.trim());
+    
     const data = rows.slice(1).map(row =>{
         return row.map((cell, index)=>{
             const trimmedCell = cell.trim();
@@ -148,18 +150,31 @@ function createChart(labels, datasets){
 }
 
 function generateChartData(headers, data){
-
-    const labels = data.map(row => row[0]);
-    const datasets = headers.slice(1).map((header, index)=>{
-        return{
-            label : header,
-            // data : data.map(row => parseFloat(row[index])),
-            data : data.map(row => parseFloat(row[index+1])),
-            backgroundColor: getRandomColor(),
-            borderColor: getRandomColor(),
-            borderWidth: 1,
-        };
-    });
+    let labels, datasets;
+    if(isOriginalOrientation){
+        labels = data.map(row => row[0]);
+        datasets = headers.slice(1).map((header, index)=>{
+            return{
+                label : header,
+                data : data.map(row => parseFloat(row[index+1])),
+                backgroundColor: getRandomColor(),
+                borderColor: getRandomColor(),
+                borderWidth: 1,
+            };
+        });
+    }else{
+        labels = headers.slice(1); 
+        datasets = data.map((row)=>{
+            return{
+                label : row[0],
+                data : row.slice(1),
+                backgroundColor: getRandomColor(),
+                borderColor: getRandomColor(),
+                borderWidth: 1,
+            };
+        });
+    }
+    console.log(data[0].slice(1))
     createChart(labels, datasets);
 }
 
