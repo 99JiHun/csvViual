@@ -3,6 +3,8 @@ const fileInput = document.getElementById('filename');
 const clickArea = document.getElementById('click-area');
 const resetArea = document.getElementById('reset-area');
 const canvas = document.getElementById('myChart');
+const toggleButton = document.getElementById('toggleOrientation');
+let isOrientation = true;
 
 let allData = [];
 
@@ -45,7 +47,8 @@ resetArea.addEventListener('click',(e)=>{
 
 
     fileInput.value = '';
-    allData.splice(0,allData.length);
+    allData = [];
+    // allData.splice(0,allData.length);
     console.log("data and visual reset.");
     e.preventDefault();
 })
@@ -59,6 +62,11 @@ fileInput.addEventListener('change', (e)=>{
     }
     
 })
+
+toggleButton.addEventListener('click', ()=>{
+    isOrientation = !isOrientation;
+    generateChartData(headers, allData);
+});
 
 function parseCSV(csvText){
     const rows = csvText.trim().split("\n").map(row => row.split(","));
@@ -140,12 +148,13 @@ function createChart(labels, datasets){
 }
 
 function generateChartData(headers, data){
-    const labels = headers;
-    const datasets = data.slice(0).map((header, index)=>{
+
+    const labels = data.map(row => row[0]);
+    const datasets = headers.slice(1).map((header, index)=>{
         return{
-            label : headers[index],
+            label : header,
             // data : data.map(row => parseFloat(row[index])),
-            data : data.map(row => parseFloat(row[index])),
+            data : data.map(row => parseFloat(row[index+1])),
             backgroundColor: getRandomColor(),
             borderColor: getRandomColor(),
             borderWidth: 1,
