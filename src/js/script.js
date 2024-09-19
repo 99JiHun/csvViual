@@ -8,6 +8,8 @@ let isOriginalOrientation = true;
 
 let headers = [];
 let allData = [];
+let currentPage = 0;
+const pageSize = 3;
 
 dropArea.addEventListener('dragover', (e)=>{
     e.preventDefault();
@@ -70,8 +72,28 @@ toggleButton.addEventListener('click', (e)=>{
     e.preventDefault();
 });
 
+document.getElementById('nextPage').addEventListener('click',(e)=>{
+    currentPage++;
+    renderPage();
+    e.preventDefault();
+});
+
+document.getElementById('prevPage').addEventListener('click',(e)=>{
+    if(currentPage > 0) currentPage--;
+    renderPage();
+    e.preventDefault();
+});
+
+document.getElementById('download-btn').addEventListener('click',(e)=>{
+    console.log('click download merge btn');
+    e.preventDefault();
+});
+
 function parseCSV(csvText){
     const rows = csvText.trim().split("\n").map(row => row.split(","));
+    rows.forEach(row =>{
+        console.log(row);
+    });
     headers = rows[0].map(header => header.trim());
     
     const data = rows.slice(1).map(row =>{
@@ -87,15 +109,18 @@ function handleFiles(files){
     for(let file of files){
         const reader = new FileReader();
         reader.onload = function(event){
-            const csvText = event.target.result;
+            const decoder = new TextDecoder('UTF-8');
+            const csvText = decoder.decode(event.target.result);
             const {headers, data} = parseCSV(csvText);
             
             allData = allData.concat(data);
             
-            updateTable(headers, allData);
+            // 데이터 확인용
+            // updateTable(headers, allData);
             generateChartData(headers, allData);
         };
-        reader.readAsText(file);
+        // reader.readAsText(file, "UTF-8");
+        reader.readAsArrayBuffer(file);
     }
 }
 
@@ -173,8 +198,7 @@ function generateChartData(headers, data){
                 borderWidth: 1,
             };
         });
-    }
-    console.log(data[0].slice(1))
+    };
     createChart(labels, datasets);
 }
 
@@ -185,4 +209,13 @@ function getRandomColor(){
         color += letters[Math.floor(Math.random()*16)];
     }
     return color;
+}
+
+function paginateData(data, page, size){
+    return data.slice(page * size, (page + 1) * size);
+}
+
+function renderPage(){
+    let paginatedData = paginateData(allData,currentPage,pageSize);
+    generateChartData(headers, paginatedData);
 }
