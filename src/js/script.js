@@ -8,6 +8,7 @@ let isOriginalOrientation = true;
 
 let headers = [];
 let allData = [];
+let mergeData = [];
 let currentPage = 0;
 const pageSize = 3;
 
@@ -86,6 +87,9 @@ document.getElementById('prevPage').addEventListener('click',(e)=>{
 
 document.getElementById('download-btn').addEventListener('click',(e)=>{
     console.log('click download merge btn');
+    mergeCSVData(headers, allData);
+    const csvContent = convertArrayToCSV(mergeData);
+    downloadCSV("merged_data.csv", csvContent);
     e.preventDefault();
 });
 
@@ -116,7 +120,7 @@ function handleFiles(files){
             allData = allData.concat(data);
             
             // 데이터 확인용
-            // updateTable(headers, allData);
+            updateTable(headers, allData);
             generateChartData(headers, allData);
         };
         // reader.readAsText(file, "UTF-8");
@@ -139,7 +143,7 @@ function updateTable(headers, data){
         const tr = document.createElement("tr");
         rowData.forEach(cell =>{
             const td = document.createElement("td");
-            td.textContent = cell || "n";
+            td.textContent = cell;
             tr.appendChild(td);
         });
         table.appendChild(tr);
@@ -218,4 +222,32 @@ function paginateData(data, page, size){
 function renderPage(){
     let paginatedData = paginateData(allData,currentPage,pageSize);
     generateChartData(headers, paginatedData);
+}
+
+function mergeCSVData(data1, data2){
+    mergeData = [];
+    mergeData.push(data1);
+    for(let i = 0; i < data2.length; i++){
+        mergeData.push(data2[i]);
+    }
+    return mergeData;
+}
+
+function convertArrayToCSV(arr){
+    return arr.map(row => row.join(",")).join("\n");
+}
+
+function downloadCSV(filename, csvContent){
+    console.log("mergeContent : " + csvContent);
+    const blob = new Blob([csvContent], {type: 'text/csv;charset=utf-8'});
+    const link = document.createElement("a");
+    const url = URL.createObjectURL(blob);
+
+    link.setAttribute("href", url);
+    link.setAttribute("download", filename);
+    link.style.visibility="hidden";
+
+    document.body.appendChild(link);
+    link.click();
+    document.body.appendChild(link);
 }
